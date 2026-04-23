@@ -2,3 +2,4 @@ venv
 data
 reports/*.csv
 *.graphml
+db2
