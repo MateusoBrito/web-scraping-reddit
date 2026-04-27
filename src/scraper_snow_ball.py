@@ -12,8 +12,8 @@ from collections import Counter, defaultdict
 # CONSTANTES
 # ─────────────────────────────────────────────
 
-INPUT_SEED = "relatorio_top_subreddits1.md"
-OUTPUT_DIR = "db2"
+INPUT_SEED = "../reports/relatorio_top_1000_subreddits.md"
+OUTPUT_DIR = "../data/raw/expansao"
 MAX_SNOWBALL_DEPTH = 3
 
 MAX_POSTS_PER_SUBREDDIT = 300
