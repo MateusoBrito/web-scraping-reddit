@@ -16,7 +16,7 @@ erros = []
 
 # Itera por cada profundidade
 for depth in range(3 + 1):
-    dir_ = f"../data/raw/final/{depth}/subreddits"
+    dir_ = f"../data/raw/expansao/{depth}/subreddits"
     if not os.path.exists(dir_):
         continue
     for filename in os.listdir(dir_):
@@ -89,5 +89,5 @@ print(f"Quantidade de nós: {g.vcount()}")
 print(f"Quantidade de arestas: {g.ecount()}")
 
 # %%
-g.write_graphml("../reports/grafo.graphml")
+g.write_graphml("../data/processed/grafo.graphml")
 # %%

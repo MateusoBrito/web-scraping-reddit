@@ -50,23 +50,40 @@ topic_model = BERTopic(
 
 topics, probs = topic_model.fit_transform(documents, centroids_matrix)
 
-#%%
-new_topics = topic_model.reduce_outliers(documents, topics)
-
-#%%
-topic_info = topic_model.get_topic_info()
-print(topic_info.head())
 # %%
-fig_words = topic_model.visualize_barchart(n_words=10)
-fig_words.write_html("../reports/topic_modeling/visualizacao_topicos.html")
-# %%
+# 1. Obter informações dos tópicos e remover colunas pesadas para o resumo
 df_topic_info = topic_model.get_topic_info()
+
+# Selecionamos apenas o essencial para o dicionário
+df_resumo = df_topic_info[['Topic', 'Count', 'Name', 'Representation']].copy()
+
+# 2. Mapeamento de Subreddits (usando topics atualizados se houve reduce_outliers)
 df_subreddit_mapping = pd.DataFrame({
     'subreddit': subreddit_names,
-    'Topic': topics
+    'Topic': topics  # Certifique-se de usar new_topics se rodou o redutor de outliers
 })
 
-topic_to_subs = df_subreddit_mapping.groupby('Topic')['subreddit'].apply(lambda x: ', '.join(x)).reset_index()
+# Agrupar nomes de subreddits por tópico
+topic_to_subs = df_subreddit_mapping.groupby('Topic')['subreddit'].apply(list).reset_index()
 topic_to_subs.columns = ['Topic', 'subreddits_list']
-topic_to_subs.to_csv("../reports/topic_modeling/dicionario_topicos_comunidades.csv", index=False)
+
+# 3. Merge e Exportação para JSON (Leve e Estruturado)
+df_dicionario_final = df_resumo.merge(topic_to_subs, on='Topic', how='left')
+df_dicionario_final.to_json("../reports/topic_modeling/dicionario_topicos.json", orient="records", indent=4)
+
+# %%
+# 4. Visualizações 
+n_clusters_total = len(df_topic_info) - 1
+fig_words = topic_model.visualize_barchart(
+    top_n_topics=n_clusters_total, 
+    n_words=10,
+    title="Assinaturas Linguísticas do Ecossistema (c-TF-IDF)"
+)
+fig_words.write_html("../reports/topic_modeling/visualizacao_topicos.html")
+
+fig_2d = topic_model.visualize_topics(
+    title="Topologia do Ecossistema: Distância entre Clusters Ideológicos"
+)
+fig_2d.write_html("../reports/topic_modeling/mapa_2d_topicos.html")
+
 # %%
